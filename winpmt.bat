@@ -26,8 +26,11 @@ REM Setup defaults
 SET COMMAND_PROCESSOR_ANSI_ENABLE_KEY=HKCU\Console
 SET COMMAND_PROCESSOR_REGISTRY_ANSI_ENABLE_VALUE=VirtualTerminalLevel
 SET COMMAND_PROCESSOR_REGISTRY_KEY=HKCU\Software\Microsoft\Command Processor
+SET COMMAND_PROCESSOR_REGISTRY_KEY2=HKCU\Console\%%SystemRoot%%_system32_cmd.exe
 SET COMMAND_PROCESSOR_REGISTRY_AUTORUN_VALUE=AutoRun
 SET COMMAND_PROCESSOR_REGISTRY_DEFAULTCOLOR_VALUE=DefaultColor
+SET COMMAND_PROCESSOR_REGISTRY_SCREENCOLORS_VALUE=ScreenColors
+
 SET COMMAND_PROCESSOR_VERSION=Microsoft Windows 11 Command Processor 
 SET COMMAND_PROCESSOR_COPYRIGHT=(c) Microsoft Corporation. All rights reserved.
 REM Time prompt and time, removing milliseconds with backspaces
@@ -140,12 +143,20 @@ REM
 COLOR %NORMAL_TEXT_COLOR%
 
 REM SET current user DefaultColor in the registry as well
-REG ADD "%COMMAND_PROCESSOR_REGISTRY_KEY%" /v %COMMAND_PROCESSOR_REGISTRY_DEFAULTCOLOR_VALUE% /t REG_DWORD /d 0x%NORMAL_TEXT_COLOR% /f >NUL  2>NUL
+REG ADD "%COMMAND_PROCESSOR_REGISTRY_KEY%" /v %COMMAND_PROCESSOR_REGISTRY_DEFAULTCOLOR_VALUE% /t REG_DWORD /d 0x%NORMAL_TEXT_COLOR% /f >NUL 2>NUL
 IF %ERRORLEVEL% NEQ 1 GOTO NO_DEFAULT_COLOR
 ECHO Error occurred trying to set the default color of the command processor. 
 ECHO Current user may not have proper access to update the registry key %COMMAND_PROCESSOR_REGISTRY_KEY%\%COMMAND_PROCESSOR_REGISTRY_DEFAULTCOLOR_VALUE%.
 EXIT /B 1
 :NO_DEFAULT_COLOR
+
+REM SET current user ScreenColors in the registry as well
+REG ADD "%COMMAND_PROCESSOR_REGISTRY_KEY2%" /v %COMMAND_PROCESSOR_REGISTRY_SCREENCOLORS_VALUE% /t REG_DWORD /d 0x%NORMAL_TEXT_COLOR% /f >NUL 2>NUL
+IF %ERRORLEVEL% NEQ 1 GOTO NO_SCREEN_COLORS
+ECHO Error occurred trying to set the screen color of the command processor. 
+ECHO Current user may not have proper access to update the registry key %COMMAND_PROCESSOR_REGISTRY_KEY2%\%COMMAND_PROCESSOR_REGISTRY_SCREENCOLORS_VALUE%.
+EXIT /B 1
+:NO_SCREEN_COLORS
 
 REM Clear screen for final display using colors previously set
 CLS
@@ -179,5 +190,3 @@ ECHO. & ECHO %COMMAND_PROCESSOR_VERSION%%VERSION% & ECHO %COMMAND_PROCESSOR_COPY
 ENDLOCAL
 REM Set the final prompt variable value and clears all the variables created by this batch script
 ENDLOCAL & (SET "PROMPT=%WINPMT%")
-
-
