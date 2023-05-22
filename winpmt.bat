@@ -1,5 +1,4 @@
-@ECHO OFF
-SETLOCAL
+@ECHO OFF & SETLOCAL
 REM ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 REM
 REM Name:        WINPMT.BAT
@@ -15,6 +14,7 @@ REM              https://learn.microsoft.com/en-us/windows/console/console-virtu
 REM
 REM              NOTE: This now ONLY works on Windows 10+ as it takes advantages of specific codes and functions only available in
 REM                    Windows 10+.
+REM                    This file must be encoded as ANSI in order for the copyright symbol to work properly.
 REM
 REM Author:      Russ Le Blang
 REM
@@ -32,11 +32,23 @@ SET COMMAND_PROCESSOR_REGISTRY_DEFAULTCOLOR_VALUE=DefaultColor
 SET COMMAND_PROCESSOR_REGISTRY_SCREENCOLORS_VALUE=ScreenColors
 
 SET COMMAND_PROCESSOR_VERSION=Microsoft Windows 11 Command Processor 
-SET COMMAND_PROCESSOR_COPYRIGHT=(c) Microsoft Corporation. All rights reserved.
+REM SET COMMAND_PROCESSOR_COPYRIGHT=(C) Microsoft Corporation. All rights reserved.
+CHCP 1252 > NUL
+SET COMMAND_PROCESSOR_COPYRIGHT=© Microsoft Corporation. All rights reserved.
+CHCP 850 > NUL
+
 REM Time prompt and time, removing milliseconds with backspaces
-SET TIME_PROMPT=Time: $T$H$H$H
+SET TIME_PROMPT=Time:$S$T$H$H$H
+REM
 REM Current directory in brackets, newline and greather-than character
-SET CONSOLE_PROMPT=[$P]$_$G
+REM
+REM SET CONSOLE_PROMPT=[$P]$_$G
+
+REM
+REM Simulate an HP-UX style prompt with the current directory in brackets, newline, user name, computer name and greather-than character
+REM
+SET CONSOLE_PROMPT=$B$S[$P]$_%USERNAME%@%COMPUTERNAME%:$G
+
 SET TITLE=WINDOWS 11
 SET INSTRUCTION1=CTRL+ESC $Q Start Menu
 SET INSTRUCTION2=Type HELP $Q Help
@@ -46,7 +58,6 @@ SET FOREGROUND_NORMAL_TEXT=37
 SET BACKGROUND_NORMAL_TEXT=40
 SET NORMAL_TEXT_COLOR=07
 SET INDEX=0
-SET "SPACE= "
 SET "TAB=     "
 
 REM Enable global support ANSI escape sequences support in the registry
@@ -99,7 +110,7 @@ EXIT /B 1
 :NO_INSTALL
 
 REM Print Time prompt and console prompt
-SET WINPMT=%TIME_PROMPT%%SPACE%%CONSOLE_PROMPT%
+SET WINPMT=%TIME_PROMPT%$S%CONSOLE_PROMPT%
 
 REM Save cursor position
 REM Previously was $E[s in ANSI.SYS
@@ -115,7 +126,7 @@ REM Clear to end of line
 SET WINPMT=%WINPMT%$E[K
 
 REM Print "Windows 11" or Whatever custom title string to appear, e.g. Company Name, User name
-SET WINPMT=%WINPMT%%SPACE%%SPACE%%TITLE%
+SET WINPMT=%WINPMT%$S$S%TITLE%
 
 REM Print tab, first user instruction, eight tabs for spacing and second user instruction
 SET WINPMT=%WINPMT%%TAB%%INSTRUCTION1%%TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%INSTRUCTION2%
@@ -158,6 +169,7 @@ ECHO Current user may not have proper access to update the registry key %COMMAND
 EXIT /B 1
 :NO_SCREEN_COLORS
 
+
 REM Clear screen for final display using colors previously set
 CLS
 
@@ -190,3 +202,7 @@ ECHO. & ECHO %COMMAND_PROCESSOR_VERSION%%VERSION% & ECHO %COMMAND_PROCESSOR_COPY
 ENDLOCAL
 REM Set the final prompt variable value and clears all the variables created by this batch script
 ENDLOCAL & (SET "PROMPT=%WINPMT%")
+IF %ERRORLEVEL% NEQ 1 GOTO NO_PROMPT
+ECHO Error occurred trying to set the PROMPT of the command processor. 
+EXIT /B 1
+:NO_PROMPT
