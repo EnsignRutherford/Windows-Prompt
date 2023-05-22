@@ -5,8 +5,7 @@ Description: Custom Command Processor prompt for Windows 10+.
              below has not worked since support for the MS-DOS subsystem was dropped, dropping ANSI.SYS support.
              An update to an article originally published in PC Magazine, originally dated March 28th, 1995 page 252.
 
-             NOTE: This now ONLY works on Windows 10+ as it takes advantages of specific codes and functions only available in
-                    Windows 10+.
+             This now ONLY works on Windows 10+ as it takes advantages of specific codes and functions only available in Windows 10+.
 
 Author:      Russ Le Blang
 
